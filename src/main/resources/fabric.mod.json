@@ -1,0 +1,33 @@
+{
+	"schemaVersion": 1,
+	"id": "overthere",
+	"version": "${version}",
+	"name": "Over There",
+	"description": "Which one are you talking about? That one, over there!",
+	"authors": [
+		"parzivail"
+	],
+	"contact": {
+		"sources": ""
+	},
+	"license": "MIT",
+	"icon": "assets/modid/icon.png",
+	"accessWidener": "overthere.accesswidener",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.parzivail.overthere.OverThere"
+		],
+		"client": [
+			"com.parzivail.overthere.OverThereClient"
+		]
+	},
+	"mixins": [
+		"overthere.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.7.2",
+		"fabric": "*",
+		"minecraft": ">=1.14-"
+	}
+}
