@@ -2,6 +2,7 @@ package com.parzivail.overthere;
 
 import com.parzivail.overthere.client.PingInstance;
 import com.parzivail.overthere.client.PingRenderer;
+import com.parzivail.overthere.client.PointRenderer;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -30,10 +31,31 @@ public class OverThereClient implements ClientModInitializer
 		KeyBindingHelper.registerKeyBinding(KEY_PING);
 
 		ClientTickEvents.START_CLIENT_TICK.register(OverThereClient::startTick);
+
 		WorldRenderEvents.AFTER_TRANSLUCENT.register(PingRenderer::renderAfterTranslucent);
 		WorldRenderEvents.END.register(PingRenderer::renderEnd);
 
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(PointRenderer::renderAfterTranslucent);
+		WorldRenderEvents.END.register(PointRenderer::renderEnd);
+
 		ClientPlayNetworking.registerGlobalReceiver(OverThere.PACKET_S2C_PONG, OverThereClient::handlePongPacket);
+		ClientPlayNetworking.registerGlobalReceiver(OverThere.PACKET_S2C_POINT, OverThereClient::handlePointPacket);
+	}
+
+	private static void handlePointPacket(MinecraftClient mc, ClientPlayNetworkHandler networkHandler, PacketByteBuf buf, PacketSender sender)
+	{
+		if (mc.world == null)
+			return;
+
+		var sourceId = buf.readUuid();
+		var isUsing = buf.readBoolean();
+
+		var sourcePlayer = mc.world.getPlayerByUuid(sourceId);
+
+		if (sourcePlayer == null)
+			return;
+
+		PointRenderer.heartbeat(sourcePlayer, isUsing);
 	}
 
 	private static void handlePongPacket(MinecraftClient mc, ClientPlayNetworkHandler networkHandler, PacketByteBuf buf, PacketSender sender)
@@ -72,6 +94,7 @@ public class OverThereClient implements ClientModInitializer
 		}
 
 		PingRenderer.tick();
+		PointRenderer.tick();
 	}
 
 	private static void sendPing(PingType pingType)

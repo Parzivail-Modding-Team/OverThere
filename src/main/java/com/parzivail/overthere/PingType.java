@@ -41,4 +41,9 @@ public enum PingType
 	{
 		return id;
 	}
+
+	public int getTextureSlot()
+	{
+		return id - 1;
+	}
 }
